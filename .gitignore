@@ -1,0 +1,21 @@
+# User-specific data (don't push these)
+programs/
+reports/
+config/
+docs/
+
+# But keep .gitkeep in these dirs
+!programs/.gitkeep
+!reports/.gitkeep
+!config/.gitkeep
+!docs/.gitkeep
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,15 +1,3 @@
-# User-specific data (don't push these)
-programs/
-reports/
-config/
-docs/
-
-# But keep .gitkeep in these dirs
-!programs/.gitkeep
-!reports/.gitkeep
-!config/.gitkeep
-!docs/.gitkeep
-
 # Editor files
 .vscode/
 .idea/
@@ -19,3 +7,6 @@ docs/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Personal data (keep dir structure with .gitkeep)
+# programs/, reports/, config/, docs/ are tracked as template

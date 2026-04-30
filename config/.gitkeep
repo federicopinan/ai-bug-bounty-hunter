@@ -1,0 +1,7 @@
+# Config: Programas Bug Bounty
+
+En este directorio se guardan las configuraciones/especificaciones de cada programa que auditor.
+
+Nombrar como: `[program-name]-scope.md`
+
+Ejemplo: `hackerone-auto-scope.md`

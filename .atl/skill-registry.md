@@ -4,10 +4,13 @@
 
 | Trigger Context | Skill | Purpose |
 |-----------------|-------|---------|
+| "init", "/init", "start target", "nuevo objetivo" | `bug-bounty-init` | Initialize new bug bounty target, create structure |
 | "recon", "enumerate", "footprinting" | `bug-bounty-recon` | Deep reconnaissance, attack surface mapping |
+| "sqlmap", "sqli", "sql injection" | `bug-bounty-sqlmap` | SQL injection scanning and exploitation |
 | "report", "writeup", "write finding" | `bug-bounty-report` | Professional vulnerability report writing |
 | "validate", "verify", "exploit", "confirm", "POC" | `bug-bounty-validate` | Vulnerability validation and exploitation verification |
-| New bug bounty target | All 3 skills in sequence | Full workflow: recon → validate → report |
+| "hunt", "/hunt", "multi-agent" | `bug-bounty-hunt` | Multi-agent vulnerability hunting (future) |
+| New bug bounty target | All skills in sequence | Full workflow: init → recon → hunt → validate → report |
 
 ## Project Standards (auto-resolved)
 
@@ -40,7 +43,9 @@
 
 | Code Context | Skill |
 |--------------|-------|
+| Directory: `.claude/skills/bug-bounty-init/` | bug-bounty-init |
 | Directory: `.claude/skills/bug-bounty-recon/` | bug-bounty-recon |
+| Directory: `.claude/skills/bug-bounty-sqlmap/` | bug-bounty-sqlmap |
 | Directory: `.claude/skills/bug-bounty-report/` | bug-bounty-report |
 | Directory: `.claude/skills/bug-bounty-validate/` | bug-bounty-validate |
 | File: `CLAUDE.md` | Hunter persona loaded automatically |

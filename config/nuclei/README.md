@@ -2,18 +2,20 @@
 
 ## Overview
 
-This directory contains nuclei templates configuration for bug bounty hunting. Nuclei is used for template-based vulnerability scanning across discovered endpoints.
+This directory contains nuclei template configuration for bug bounty
+hunting. Nuclei is used for template-based vulnerability scanning across
+discovered endpoints.
 
 ## Directory Structure
 
 ```
 config/nuclei/
-├── templates/           # Custom nuclei templates
-│   ├── low-severity/   # Low severity findings
-│   ├── medium-severity/ # Medium severity findings
-│   ├── high-severity/  # High severity findings
-│   └── critical/       # Critical severity (RCE, SQLi, Auth bypass)
-└── .nuclei-config.yml  # Nuclei configuration
+├── templates/             # Custom nuclei templates
+│   ├── low-severity/      # Low severity findings
+│   ├── medium-severity/   # Medium severity findings
+│   ├── high-severity/     # High severity findings
+│   └── critical/          # Critical severity (RCE, SQLi, Auth bypass)
+└── .nuclei-config.yml     # Nuclei configuration
 ```
 
 ## Official Templates (Download)
@@ -32,7 +34,7 @@ cd ~/tools/nuclei-templates && git pull
 ### Critical (P0) — High Impact
 - CVE critical templates
 - SQL injection templates
-- RCE/Command injection templates
+- RCE / command injection templates
 - Auth bypass templates
 
 ### High (P1)
@@ -140,7 +142,6 @@ tags:
 When running `/hunt`, nuclei is called automatically:
 
 ```bash
-# From bug-bounty-hunt workflow
 nuclei -l programs/{target}/recon/live-hosts.txt \
   -t ~/tools/nuclei-templates \
   -o programs/{target}/vulns/nuclei-results.txt
@@ -162,7 +163,7 @@ nuclei -t ~/tools/nuclei-templates/critical/ \
 ## Quick Reference
 
 | Command | Use Case |
-|---------|----------|
+|---|---|
 | `nuclei -l hosts.txt -t templates/` | Standard scan |
 | `nuclei -l hosts.txt -severity critical` | Critical only |
 | `nuclei -l hosts.txt -t cves/` | CVE focused |

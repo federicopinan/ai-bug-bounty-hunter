@@ -2,11 +2,11 @@
   "hooks": [
     {
       "event": "SessionStart",
-      "command": "echo 'Bug Bounty Session Started. Run /recon <target> to begin or /hunt to continue an active target. Check scope FIRST.'"
+      "command": "echo 'Bug Bounty session started. Run /scope <target> to confirm in-scope assets, then /init to create the workspace, or /recon to continue an active target.'"
     },
     {
       "event": "SessionStop",
-      "command": "echo 'Session ended. Save findings to findings/. Run /validate on any leads before next session.'"
+      "command": "echo 'Session ended. Save findings to programs/{target}/vulns/tracker.md. Run /validate on any leads before the next session.'"
     },
     {
       "event": "Stop",

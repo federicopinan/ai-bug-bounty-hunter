@@ -1,12 +1,53 @@
-# Editor files
+# ──────────────────────────────────────────────────────────────
+# Editor / OS
+# ──────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS files
 .DS_Store
 Thumbs.db
 
-# Personal data (keep dir structure with .gitkeep)
-# programs/, reports/, config/, docs/ are tracked as template
+# ──────────────────────────────────────────────────────────────
+# Harness runtime state (regenerated, not part of the repo)
+# ──────────────────────────────────────────────────────────────
+.atl/                       # gentle-pi skill registry cache
+.pi/                        # Pi runtime settings/state
+
+# ──────────────────────────────────────────────────────────────
+# Tool output (bulk dumps, can be large and contain target data)
+# ──────────────────────────────────────────────────────────────
+*.log
+
+# Nuclei
+programs/*/vulns/nuclei-*.txt
+programs/*/vulns/nuclei-*.json
+
+# SQLMap
+programs/*/vulns/sqlmap-*.txt
+programs/*/vulns/sqlmap-output/
+programs/*/vulns/*.csv
+
+# XSStrike / Dalfox
+programs/*/vulns/xsstrike-*.txt
+programs/*/vulns/dalfox-*.txt
+
+# Wayback / katana / gau URL lists (regenerable, often huge)
+programs/*/recon/wayback.txt
+programs/*/recon/urls.txt
+programs/*/recon/katana-*.txt
+programs/*/recon/gau-*.txt
+programs/*/recon/gospider-*.txt
+
+# Screenshots and visual evidence (binary, regenerable)
+programs/*/screenshots/
+programs/*/vulns/poc/screenshots/
+
+# Wordlist & tool caches
+.cache/
+
+# ──────────────────────────────────────────────────────────────
+# Sensitive (in case of accidental local-only data)
+# ──────────────────────────────────────────────────────────────
+# Uncomment if you keep scope files with private bounty tokens / non-public scope
+# config/*-scope-private.md

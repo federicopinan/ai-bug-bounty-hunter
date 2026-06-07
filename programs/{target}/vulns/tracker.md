@@ -6,21 +6,25 @@ Copy this file to `programs/{target}/vulns/tracker.md` for each target.
 
 ---
 
-# [Target Name] - Findings Tracker
+# [Target Name] — Findings Tracker
 
 ## Program Info
-- **Target**: [target.com]
-- **Program**: [HackerOne/Bugcrowd/etc]
-- **Scope**: [in-scope assets]
-- **Rewards**: [reward range]
-- **Started**: [date]
+
+| Field | Value |
+|---|---|
+| **Target** | [target.com] |
+| **Program** | [HackerOne / Bugcrowd / Intigriti / Immunefi / self-hosted] |
+| **Scope URL** | [link to program policy] |
+| **Scope** | [in-scope assets] |
+| **Rewards** | [reward range] |
+| **Started** | [YYYY-MM-DD] |
 
 ---
 
 ## Summary Stats
 
-| Severity | Total | Validated | Reported | duplicates | Closed |
-|----------|-------|-----------|----------|------------|--------|
+| Severity | Total | Validated | Reported | Duplicates | Closed |
+|---|---|---|---|---|---|
 | Critical | 0 | 0 | 0 | 0 | 0 |
 | High | 0 | 0 | 0 | 0 | 0 |
 | Medium | 0 | 0 | 0 | 0 | 0 |
@@ -29,116 +33,117 @@ Copy this file to `programs/{target}/vulns/tracker.md` for each target.
 
 ---
 
-## P0 - Critical
+## P0 — Critical
 
 ### [Finding Title]
 
 | Field | Value |
-|-------|-------|
+|---|---|
 | **Endpoint** | |
-| **Status** | [NEW/VALIDATED/REPORTED/DUPLICATE/CLOSED/INVALID] |
+| **Status** | [NEW / VALIDATED / REPORTED / DUPLICATE / CLOSED / INVALID] |
 | **Severity** | Critical |
 | **CVSS** | [vector] → [score] |
-| **Found Date** | [date] |
-| **Reported Date** | [date/N/A] |
-| **Bounty** | [$amount/N/A] |
-| **Platform ID** | [H1-123456] |
+| **Found Date** | [YYYY-MM-DD] |
+| **Reported Date** | [YYYY-MM-DD / N/A] |
+| **Bounty** | [$amount / N/A] |
+| **Platform ID** | [H1-123456 / N/A] |
 
-**Description**:
-[One sentence - what an attacker can do]
+**Description**
+[One sentence — what an attacker can do]
 
-**Steps to Reproduce**:
+**Steps to Reproduce**
 1. [Step]
 2. [Step]
 
-**Impact**:
-[Business impact]
+**Impact**
+[Business impact, quantified]
 
-**Evidence**:
-- [Link to PoC/file]
+**Evidence**
+- [Link to PoC file]
+- [Link to screenshot]
 
-**HackerOne Link**: [URL]
+**HackerOne / Platform Link**: [URL]
 
-**Notes**:
+**Notes**
 -
 
 ---
 
-## P1 - High
+## P1 — High
 
 ### [Finding Title]
 
 | Field | Value |
-|-------|-------|
+|---|---|
 | **Endpoint** | |
-| **Status** | [NEW/VALIDATED/REPORTED/DUPLICATE/CLOSED/INVALID] |
+| **Status** | [NEW / VALIDATED / REPORTED / DUPLICATE / CLOSED / INVALID] |
 | **Severity** | High |
 | **CVSS** | [vector] → [score] |
-| **Found Date** | [date] |
-| **Reported Date** | [date/N/A] |
-| **Bounty** | [$amount/N/A] |
-| **Platform ID** | [H1-123456] |
+| **Found Date** | [YYYY-MM-DD] |
+| **Reported Date** | [YYYY-MM-DD / N/A] |
+| **Bounty** | [$amount / N/A] |
+| **Platform ID** | [H1-123456 / N/A] |
 
-**Description**:
+**Description**
 [One sentence]
 
-**Impact**:
+**Impact**
 [Business impact]
 
-**Evidence**:
+**Evidence**
 - [PoC]
 
 ---
 
-## P2 - Medium
+## P2 — Medium
 
 ### [Finding Title]
 
 | Field | Value |
-|-------|-------|
+|---|---|
 | **Endpoint** | |
-| **Status** | [NEW/VALIDATED/REPORTED/DUPLICATE/CLOSED/INVALID] |
+| **Status** | [NEW / VALIDATED / REPORTED / DUPLICATE / CLOSED / INVALID] |
 | **Severity** | Medium |
 | **CVSS** | [vector] → [score] |
-| **Found Date** | [date] |
-| **Reported Date** | [date/N/A] |
-| **Bounty** | [$amount/N/A] |
-| **Platform ID** | [H1-123456] |
+| **Found Date** | [YYYY-MM-DD] |
+| **Reported Date** | [YYYY-MM-DD / N/A] |
+| **Bounty** | [$amount / N/A] |
+| **Platform ID** | [H1-123456 / N/A] |
 
 ---
 
-## P3 - Low
+## P3 — Low
 
 ### [Finding Title]
 
 | Field | Value |
-|-------|-------|
+|---|---|
 | **Endpoint** | |
-| **Status** | [NEW/VALIDATED/REPORTED/DUPLICATE/CLOSED/INVALID] |
+| **Status** | [NEW / VALIDATED / REPORTED / DUPLICATE / CLOSED / INVALID] |
 | **Severity** | Low |
-| **Found Date** | [date] |
-| **Reported Date** | [date/N/A] |
+| **Found Date** | [YYYY-MM-DD] |
+| **Reported Date** | [YYYY-MM-DD / N/A] |
 
 ---
 
-## P4 - Informational
+## P4 — Informational
 
 ### [Finding Title]
 
 | Field | Value |
-|-------|-------|
+|---|---|
 | **Endpoint** | |
-| **Status** | [NEW/VALIDATED/REPORTED/DUPLICATE/CLOSED/INVALID] |
+| **Status** | [NEW / VALIDATED / REPORTED / DUPLICATE / CLOSED / INVALID] |
 | **Severity** | Informational |
-| **Found Date** | [date] |
+| **Found Date** | [YYYY-MM-DD] |
 
 ---
 
 ## False Positives / Rejected
 
 | Finding | Reason | Date |
-|---------|--------|------|
-| [Title] | [Why rejected] | [date] |
+|---|---|---|
+| [Title] | [Why rejected] | [YYYY-MM-DD] |
 | | | |
 
 ---
@@ -146,7 +151,7 @@ Copy this file to `programs/{target}/vulns/tracker.md` for each target.
 ## Status Legend
 
 | Status | Meaning |
-|--------|---------|
+|---|---|
 | `NEW` | Found, not validated yet |
 | `VALIDATED` | Confirmed exploitable |
 | `REPORTED` | Submitted to platform |
@@ -160,9 +165,9 @@ Copy this file to `programs/{target}/vulns/tracker.md` for each target.
 ## Workflow Commands
 
 ```
-/validate [finding]  → Validate before reporting
-/report [finding]     → Generate report draft
-/track [finding] --status=REPORTED --id=H1-XXX → Update status
+/validate [finding]                                      → Validate before reporting
+/report [finding]                                        → Generate report draft
+/track [finding] --status=REPORTED --id=H1-XXX          → Update status
 ```
 
 ---
@@ -170,7 +175,7 @@ Copy this file to `programs/{target}/vulns/tracker.md` for each target.
 ## Activity Log
 
 | Date | Finding | Action | Notes |
-|------|---------|--------|-------|
+|---|---|---|---|
 | YYYY-MM-DD | [finding] | [action] | [notes] |
 | | | | |
 

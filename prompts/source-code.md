@@ -1,9 +1,8 @@
-# Prompt: Análisis de Código Fuente
+# Prompt: Source Code Analysis
 
-Para casos donde tenés acceso al código fuente del objetivo.
+For cases where you have access to the target's source code.
 
-## Uso
+## Usage
 
-Reemplazar `[PASTE THE FULL PROGRAM GUIDELINES HERE]` con las reglas específicas del programa bug bounty objetivo.
-
-Luego ejecutar el análisis con el target adecuado.
+Replace `[PASTE THE FULL PROGRAM GUIDELINES HERE]` with the specific rules of
+the target bug bounty program, then run the analysis against the target.

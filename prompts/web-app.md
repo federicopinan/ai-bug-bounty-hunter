@@ -1,3 +1,3 @@
-# Prompt: Análisis de Aplicaciones Web
+# Prompt: Web Application Analysis
 
-Para auditorías de aplicaciones web, APIs, y servicios HTTP.
+For audits of web applications, APIs, and HTTP services.

@@ -1,3 +1,19 @@
+```
+  ============================================================
+   _   _   _ _____ ___  __  __   _   _ _   _ _____ ____ ____
+  | | | | / |  _  |_ _||  \/  | | \ | | \ | |_   _|  _ \_   _|
+  | |_| | | | |_) || | | |\/| | |  \| |  \| | | | | |_) || |
+  |  _  | | |  _ < | | | |  | | | |\  | |\  | | | |  _ < | |
+  |_| |_| |_|_| \_\|___||_|  |_| |_| \_|_| \_| |_| |_| \_\|_|
+  /_/   \_\_\   /_/   /_/   \_\_\   /_/   \_\___/
+  ============================================================
+        [ RECON ]  ->  [ HUNT ]  ->  [ VALIDATE ]  ->  [ REPORT ]
+        //  scanning the perimeter since the perimeter had bugs  //
+  ============================================================
+```
+
+> AI-assisted bug bounty hunting workspace. Recon → Hunt → Validate → Report.
+
 # Hunter — Bug Bounty Hunting Environment
 
 AI-assisted security research framework for public bug bounty programs

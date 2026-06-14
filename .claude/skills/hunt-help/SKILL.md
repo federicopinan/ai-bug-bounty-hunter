@@ -44,6 +44,8 @@ It is:
 - A skills library that turns each phase of the workflow into a
   repeatable procedure (`.claude/skills/`).
 - A curated payload library (`payloads/`) and wordlists (`wordlists/`).
+- A methodology library (`methodology/`) with auth matrices and focused
+  playbooks for high-signal manual testing.
 - A per-target workspace scaffold (`programs/{target}/`) for evidence
   and findings.
 
@@ -96,12 +98,16 @@ phrases the agent will match.
 |---|---|
 | `tools/scripts/recon.sh <target>` | Run the recon pipeline from the shell |
 | `tools/scripts/hunt.sh <target>` | Run the hunt pipeline from the shell |
+| `tools/scripts/check-env.sh` | Check required Kali/tooling dependencies without installing anything |
+| `tools/scripts/new-finding.sh <severity> <type> <title> [target]` | Create a safe HackerOne-style finding draft |
 
 ### Reference material
 
 | Resource | Where |
 |---|---|
 | Methodology rules | `rules/hunting.md`, `rules/reporting.md` |
+| Manual methodology | `methodology/` (auth matrix, API, IDOR/BOLA, ATO, OAuth/SSO, business logic playbooks) |
+| Target templates | `templates/target/` (auth matrix, hunt session, evidence log) |
 | Curated payloads | `payloads/*.md` (XSS, SQLi, SSRF, IDOR, JWT, OAuth, SSTI, LFI, XXE, auth bypass, cmd injection) |
 | Dork cheat sheets | `tools/dorks/google-dorks.md`, `tools/dorks/github-dorks.md`, `tools/dorks/shodan-dorks.md` |
 | Wordlists | `wordlists/common.txt`, `wordlists/params.txt`, `wordlists/api-endpoints.txt`, `wordlists/sensitive-files.txt` |
@@ -137,6 +143,13 @@ like this. Numbers in brackets are rough time-boxes.
      /hunt acme.com --xss --sqli --idor
      (or: tools/scripts/hunt.sh acme.com)
      → fills programs/acme.com/vulns/*
+
+     For auth, IDOR/BOLA, account takeover, OAuth/SSO, API, or business
+     logic testing, open the matching `methodology/*-playbook.md` first.
+     Use `methodology/auth-matrix.md` or `templates/target/auth-matrix.md`
+     when testing multiple roles, tenants, ownership states, or privilege
+     boundaries. The matrix prevents missed negative controls and makes
+     validation evidence easier to report.
 
 [6]  Validate each lead
      /validate sqli in /api/products?id= on api.acme.com
@@ -177,15 +190,19 @@ like this. Numbers in brackets are rough time-boxes.
 │   ├── hunting.md                  # 20 rules — read before every hunt
 │   └── reporting.md                # 12 rules — read before every report
 │
+├── methodology/                    # auth matrix + manual testing playbooks
+│
 ├── payloads/                       # curated payload library (per class)
 │
 ├── wordlists/                      # compact starter wordlists
 │
 ├── tools/
 │   ├── dorks/                      # google / github / shodan dorks
-│   ├── scripts/                    # recon.sh, hunt.sh
+│   ├── scripts/                    # recon.sh, hunt.sh, check-env.sh, new-finding.sh
 │   ├── sqlmap-cheatsheet.md
 │   └── nuclei-templates/
+│
+├── templates/target/               # reusable target docs and evidence logs
 │
 ├── config/                         # per-program & per-tool config
 │

@@ -18,8 +18,8 @@
 
 AI-assisted security research framework for public bug bounty programs
 (HackerOne, Bugcrowd, Intigriti, Immunefi, and equivalents). Provides
-methodology rules, skill-driven workflows, a curated payload library, and
-tooling bootstrap.
+methodology rules and playbooks, skill-driven workflows, a curated payload
+library, target templates, and tooling bootstrap.
 
 > **Operator role.** This is a hunter workspace, not a pentest deliverable.
 > Optimize for *real-world exploitable impact* and payout, not for
@@ -40,6 +40,9 @@ make install                  # or ./install.sh
 # 2. Pull wordlists (SecLists, OneListForAll, nuclei templates)
 make wordlists
 
+# Optional Kali/tooling smoke check (read-only; does not install anything)
+tools/scripts/check-env.sh
+
 # 3. Confirm the target is in scope
 /scope <target>               # reads program policy, flags in/out-of-scope
 
@@ -59,6 +62,8 @@ make wordlists
 
 # 8. Report
 /report <finding>             # writes to reports/<program>.md
+# or create a draft directly:
+tools/scripts/new-finding.sh High IDOR "Invoice download exposes other users" <target>
 ```
 
 ---
@@ -77,6 +82,11 @@ SCOPE  →  RECON  →  HUNT  →  VALIDATE  →  REPORT
 
 Each phase has a dedicated skill. Don't skip phases. A bug found in HUNT that
 failed VALIDATE is just noise.
+
+Use `methodology/` during manual testing: start with `methodology/auth-matrix.md`
+or `templates/target/auth-matrix.md` for role, tenant, ownership, and auth-state
+coverage, then follow the relevant playbook for API, IDOR/BOLA, account takeover,
+OAuth/SSO, or business logic testing.
 
 ---
 
@@ -130,6 +140,16 @@ the difference between a 5% validity ratio and a 60% one.
 The skills assume the following tools are on `$PATH`. `make install` will
 fetch and place them in `~/tools` and `~/go/bin`.
 
+For a safe Kali smoke check, run:
+
+```bash
+tools/scripts/check-env.sh
+```
+
+The check is read-only: it never installs packages or runs `sudo`. If required
+tools are missing, it prints suggested `apt` and `go install` commands for you
+to review and run manually.
+
 | Phase | Tools |
 |---|---|
 | Recon | `subfinder`, `amass`, `assetfinder`, `httpx`, `dnsx`, `katana`, `waybackurls`, `gau`, `gospider` |
@@ -147,6 +167,9 @@ fetch and place them in `~/tools` and `~/go/bin`.
 | Proxy / intercept | `mitmproxy`, `Burp Suite` (manual) |
 
 If a tool is missing, the skill will tell you what to install.
+
+Required smoke-check tools: `subfinder`, `amass`, `httpx`, `nuclei`, `ffuf`,
+`whatweb`, `jq`, `git`, and `curl`.
 
 ---
 
@@ -173,6 +196,18 @@ and [PortSwigger Web Security Academy](https://portswigger.net/web-security).
 
 When you need scale beyond these lists, see `wordlists/REFERENCES.md` for
 full upstream collections (SecLists, OneListForAll, fuzz4bounty).
+
+---
+
+## Methodology and Templates
+
+- `methodology/` contains focused manual testing playbooks and the reusable auth
+  matrix. Use it before testing auth, IDOR/BOLA, API, OAuth/SSO, account
+  takeover, or business logic surfaces.
+- `templates/target/` contains target-local templates for `auth-matrix.md`,
+  `hunt-session.md`, and `evidence-log.md`.
+- `tools/scripts/new-finding.sh` creates HackerOne-style Markdown finding drafts
+  under `programs/<target>/vulns/` or the current directory.
 
 ---
 
@@ -212,6 +247,8 @@ and install commands.
 │   ├── hunting.md
 │   └── reporting.md
 │
+├── methodology/                    # Auth matrix and manual testing playbooks
+│
 ├── prompts/                        # Standalone prompt templates (optional,
 │                                   # most flows are now skills)
 │
@@ -243,6 +280,10 @@ and install commands.
 │           └── confirmed/
 │
 ├── tools/                          # Local helper scripts
+│   └── scripts/                    # recon.sh, hunt.sh, check-env.sh, new-finding.sh
+│
+├── templates/                      # Boilerplate files for new targets
+│   └── target/                     # auth-matrix, hunt-session, evidence-log
 │
 ├── reports/                        # Generated reports (per-program)
 │
@@ -250,7 +291,6 @@ and install commands.
 │
 ├── hooks/                          # Harness hooks (if supported)
 │
-└── templates/                      # Boilerplate files for new targets
 ```
 
 ---

@@ -1,0 +1,110 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  markdown:
+    name: Markdown (markdownlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: |
+            **/*.md
+          config: .markdownlint.json
+
+  shell:
+    name: Shell (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck
+        run: |
+          set -e
+          mapfile -t files < <(find . -type f \( -name '*.sh' -o -name 'install.sh' \) \
+            -not -path './.git/*' \
+            -not -path './.atl/*' \
+            -not -path './.pi/*')
+          if (( ${#files[@]} == 0 )); then
+            echo "No shell scripts to check."
+            exit 0
+          fi
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck --severity=warning "${files[@]}"
+
+  json:
+    name: JSON (jq)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON files
+        run: |
+          set -e
+          mapfile -t files < <(find . -type f -name '*.json' \
+            -not -path './.git/*' \
+            -not -path './.atl/*' \
+            -not -path './.pi/*' \
+            -not -path './node_modules/*')
+          if (( ${#files[@]} == 0 )); then
+            echo "No JSON files to check."
+            exit 0
+          fi
+          fail=0
+          for f in "${files[@]}"; do
+            if ! jq empty "$f" >/dev/null 2>&1; then
+              echo "::error file=$f::invalid JSON"
+              fail=1
+            fi
+          done
+          exit $fail
+
+  yaml:
+    name: YAML (yamllint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yamllint
+        run: |
+          python3 -m pip install --quiet --upgrade yamllint
+      - name: Run yamllint
+        run: |
+          set -e
+          mapfile -t files < <(find . -type f \( -name '*.yml' -o -name '*.yaml' \) \
+            -not -path './.git/*' \
+            -not -path './.atl/*' \
+            -not -path './.pi/*' \
+            -not -path './node_modules/*')
+          if (( ${#files[@]} == 0 )); then
+            echo "No YAML files to check."
+            exit 0
+          fi
+          yamllint -d '{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable}}' "${files[@]}"
+
+  links:
+    name: Links (lychee)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --offline
+            --no-progress
+            --exclude-loopback
+            --exclude-mail
+            --exclude 'https://portswigger.net'
+            --exclude 'https://github.com/.*/(issues|pulls|actions|releases).*'
+            --exclude 'https://www.linkedin.com'
+            **/*.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

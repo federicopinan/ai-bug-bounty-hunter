@@ -1,0 +1,24 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  skills:
+    name: Skills frontmatter & links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run skill validator
+        run: |
+          python3 tools/validate-skills.py .claude/skills/

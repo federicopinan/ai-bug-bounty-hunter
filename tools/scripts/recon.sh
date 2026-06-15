@@ -31,11 +31,10 @@ if [ -t 1 ]; then
     C_FAIL="\033[1;31m"   # red
     C_WARN="\033[1;33m"   # yellow
     C_INFO="\033[1;36m"   # cyan
-    C_DIM="\033[2m"
     C_BOLD="\033[1m"
     C_OFF="\033[0m"
 else
-    C_OK=""; C_FAIL=""; C_WARN=""; C_INFO=""; C_DIM=""; C_BOLD=""; C_OFF=""
+    C_OK=""; C_FAIL=""; C_WARN=""; C_INFO=""; C_BOLD=""; C_OFF=""
 fi
 
 ok()   { printf "  ${C_OK}[+]${C_OFF} %s\n" "$*"; }
@@ -199,8 +198,6 @@ else
     elif [ ! -s "$OUT_DIR/live-hosts.txt" ]; then
         warn "no live hosts to scan"
     else
-        # Top bug-bounty ports: web front-ends, dev consoles, common admin.
-        PORTS="22,80,443,3000,4000,5000,8000,8080,8443,8888,9000,9090,9200,27017"
         # Extract clean URL list from httpx output (URL is the first column
         # with -status-code; for other httpx versions it's hostname:port).
         URL_LIST="$OUT_DIR/urls.txt"

@@ -14,10 +14,9 @@ if [ -t 1 ]; then
     C_FAIL="\033[1;31m"
     C_WARN="\033[1;33m"
     C_INFO="\033[1;36m"
-    C_BOLD="\033[1m"
     C_OFF="\033[0m"
 else
-    C_OK=""; C_FAIL=""; C_WARN=""; C_INFO=""; C_BOLD=""; C_OFF=""
+    C_OK=""; C_FAIL=""; C_WARN=""; C_INFO=""; C_OFF=""
 fi
 
 ok()   { printf "  ${C_OK}[+]${C_OFF} %s\n" "$*"; }

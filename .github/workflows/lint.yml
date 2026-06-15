@@ -102,6 +102,10 @@ jobs:
             --no-progress
             --exclude-loopback
             --exclude-mail
+            --exclude '^\.agents/'
+            --exclude '^payloads/'
+            --exclude '^programs/\{target\}/'
+            --exclude '^\.claude/skills/bug-bounty-init/assets/notes-template\.md$'
             --exclude 'https://portswigger.net'
             --exclude 'https://github.com/.*/(issues|pulls|actions|releases).*'
             --exclude 'https://www.linkedin.com'

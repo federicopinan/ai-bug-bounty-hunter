@@ -11,8 +11,10 @@ Thumbs.db
 # ──────────────────────────────────────────────────────────────
 # Harness runtime state (regenerated, not part of the repo)
 # ──────────────────────────────────────────────────────────────
-.atl/                       # gentle-pi skill registry cache
-.pi/                        # Pi runtime settings/state
+.atl/*                       # gentle-pi skill registry cache
+.pi/  # Pi runtime settings/state
+atl/
+.atl/
 
 # ──────────────────────────────────────────────────────────────
 # Tool output (bulk dumps, can be large and contain target data)

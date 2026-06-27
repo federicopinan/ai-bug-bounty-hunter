@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #1f1f28;
+  color: #dcd7ba;
+  font-family:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background-color: #7e9cd8;
+  color: #1f1f28;
+}
+
+/* Scrollbar — Kanagawa styled */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #1f1f28;
+}
+::-webkit-scrollbar-thumb {
+  background: #54546d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7e9cd8;
+}
+
+/* ASCII banner shimmer (subtle) */
+@keyframes kanagawa-shimmer {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.kg-shimmer {
+  animation: kanagawa-shimmer 4s ease-in-out infinite;
+}
+
+/* Card hover */
+.kg-card {
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.kg-card:hover {
+  transform: translateY(-2px);
+  border-color: #7e9cd8;
+}
+
+/* Pulse dot for live activity */
+@keyframes kanagawa-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(135, 169, 135, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(135, 169, 135, 0);
+  }
+}
+
+.kg-pulse {
+  animation: kanagawa-pulse 2s infinite;
+}
+
+/* ASCII banner — pure CSS, no image */
+.kg-banner {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.05;
+  white-space: pre;
+  color: #c8c093;
+  overflow-x: auto;
+}
+
+@media (min-width: 768px) {
+  .kg-banner {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .kg-banner {
+    font-size: 13px;
+  }
+}

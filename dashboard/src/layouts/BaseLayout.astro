@@ -1,0 +1,58 @@
+---
+import '../styles/kanagawa.css';
+import KanagawaHeader from '../components/KanagawaHeader.astro';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  hideHeader?: boolean;
+}
+
+const { title, subtitle, hideHeader = false } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · Hunter Dashboard</title>
+    <meta name="description" content="Read-only observability dashboard for the Hunter bug bounty workspace." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-kg-bg text-kg-fg min-h-screen flex flex-col">
+    {!hideHeader && <KanagawaHeader title={title} subtitle={subtitle} />}
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6">
+      <slot />
+    </main>
+
+    <footer class="border-t border-kg-border mt-12">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-xs font-mono text-kg-fg-faded">
+        <span>
+          hunter · kanagawa dragon · <span class="text-kg-wave-blue">read-only</span>
+        </span>
+        <span>
+          <a href="/api/programs" class="hover:text-kg-wave-blue">/api/programs</a>
+          ·
+          <a href="/api/findings" class="hover:text-kg-wave-blue">/api/findings</a>
+          ·
+          <a href="/api/activity" class="hover:text-kg-wave-blue">/api/activity</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  /* Ensure SSR-only route flushing works for live updates */
+  body {
+    min-height: 100vh;
+  }
+</style>

@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FindingRow from '../components/FindingRow.astro';
+import EmptyState from '../components/EmptyState.astro';
+import { getAllFindings } from '../lib/scanner.ts';
+import { SEVERITY_ORDER } from '../lib/types.ts';
+
+export const prerender = false;
+
+const url = Astro.url;
+const severityParam = url.searchParams.getAll('severity');
+const statusParam = url.searchParams.getAll('status');
+const targetParam = url.searchParams.getAll('target');
+const searchParam = (url.searchParams.get('q') ?? '').toLowerCase().trim();
+
+const all = await getAllFindings();
+
+let findings = all;
+
+if (severityParam.length > 0) {
+  findings = findings.filter((f) => severityParam.includes(f.severity));
+}
+if (statusParam.length > 0) {
+  findings = findings.filter((f) => statusParam.includes(f.status));
+}
+if (targetParam.length > 0) {
+  findings = findings.filter((f) => targetParam.includes(f.target));
+}
+if (searchParam) {
+  findings = findings.filter((f) =>
+    `${f.title} ${f.endpoint ?? ''} ${f.type}`.toLowerCase().includes(searchParam),
+  );
+}
+
+findings.sort((a, b) => {
+  const sevDiff = SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity);
+  if (sevDiff !== 0) return sevDiff;
+  return a.target.localeCompare(b.target);
+});
+
+const allSeverities = ['Critical', 'High', 'Medium', 'Low', 'Info'];
+const allStatuses = ['NEW', 'VALIDATED', 'REPORTED', 'DUPLICATE', 'CLOSED', 'RESOLVED', 'INVALID'];
+const allTargets = [...new Set(all.map((f) => f.target))].sort();
+
+function toggleUrl(key: string, value: string): string {
+  const params = new URLSearchParams(url.searchParams);
+  const current = params.getAll(key);
+  params.delete(key);
+  if (current.includes(value)) {
+    for (const v of current) if (v !== value) params.append(key, v);
+  } else {
+    for (const v of current) params.append(key, v);
+    params.append(key, value);
+  }
+  return `/findings?${params.toString()}`;
+}
+
+function clearFilters(): string {
+  return '/findings';
+}
+---
+<BaseLayout title="Findings" subtitle={`${findings.length} of ${all.length} findings across all programs`}>
+  <form method="get" action="/findings" class="bg-kg-bg-elevated border border-kg-border rounded-lg p-4 mb-4 space-y-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+        <label class="text-kg-fg-faded font-mono text-xs uppercase tracking-wider shrink-0">Search</label>
+        <input
+          type="text"
+          name="q"
+          value={searchParam}
+          placeholder="title, endpoint, type…"
+          class="bg-kg-bg-card border border-kg-border rounded px-2 py-1 text-sm text-kg-fg font-mono flex-1 focus:outline-none focus:border-kg-wave-blue"
+        />
+      </div>
+      <a
+        href={clearFilters()}
+        class="text-kg-fg-faded font-mono text-xs uppercase tracking-wider hover:text-kg-dragon-red"
+      >
+        clear all
+      </a>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-kg-fg-faded font-mono text-xs uppercase tracking-wider">Severity</span>
+      {allSeverities.map((s) => {
+        const active = severityParam.includes(s);
+        const href = toggleUrl('severity', s);
+        const cls = active
+          ? 'bg-kg-wave-blue/20 border-kg-wave-blue text-kg-wave-blue'
+          : 'border-kg-border text-kg-fg-faded hover:text-kg-fg';
+        return (
+          <a href={href} class={`text-xs font-mono px-2 py-1 rounded border ${cls}`}>
+            {s}
+          </a>
+        );
+      })}
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-kg-fg-faded font-mono text-xs uppercase tracking-wider">Status</span>
+      {allStatuses.map((s) => {
+        const active = statusParam.includes(s);
+        const href = toggleUrl('status', s);
+        const cls = active
+          ? 'bg-kg-dragon-green/20 border-kg-dragon-green text-kg-dragon-green'
+          : 'border-kg-border text-kg-fg-faded hover:text-kg-fg';
+        return (
+          <a href={href} class={`text-xs font-mono px-2 py-1 rounded border ${cls}`}>
+            {s}
+          </a>
+        );
+      })}
+    </div>
+
+    {allTargets.length > 0 && (
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-kg-fg-faded font-mono text-xs uppercase tracking-wider">Target</span>
+        {allTargets.map((t) => {
+          const active = targetParam.includes(t);
+          const href = toggleUrl('target', t);
+          const cls = active
+            ? 'bg-kg-autumn/20 border-kg-autumn text-kg-autumn'
+            : 'border-kg-border text-kg-fg-faded hover:text-kg-fg';
+          return (
+            <a href={href} class={`text-xs font-mono px-2 py-1 rounded border ${cls}`}>
+              {t}
+            </a>
+          );
+        })}
+      </div>
+    )}
+
+    <noscript>
+      <button type="submit" class="bg-kg-wave-blue text-kg-bg font-mono text-xs uppercase px-3 py-1.5 rounded">
+        Apply filters
+      </button>
+    </noscript>
+  </form>
+
+  {findings.length === 0 ? (
+    <EmptyState
+      title="No findings match"
+      message="Adjust filters or initialize a target with findings."
+      hint="The dashboard only reads existing files — no edits required."
+    />
+  ) : (
+    <div class="space-y-2">
+      {findings.map((f) => <FindingRow finding={f} />)}
+    </div>
+  )}
+</BaseLayout>

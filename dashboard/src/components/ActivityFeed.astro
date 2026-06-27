@@ -1,0 +1,66 @@
+---
+import type { ActivityEvent } from '../lib/types.ts';
+
+interface Props {
+  events: ActivityEvent[];
+}
+
+const { events } = Astro.props;
+
+const kindColors: Record<string, string> = {
+  event: 'text-kg-autumn border-kg-autumn/40',
+  recon: 'text-kg-wave-aqua border-kg-wave-aqua/40',
+  finding: 'text-kg-dragon-red border-kg-dragon-red/40',
+  note: 'text-kg-ononokami border-kg-ononokami/40',
+  screenshot: 'text-kg-autumn border-kg-autumn/40',
+  poc: 'text-kg-dragon-green border-kg-dragon-green/40',
+  report: 'text-kg-wave-blue border-kg-wave-blue/40',
+  scope: 'text-kg-fg-muted border-kg-fg-muted/40',
+  other: 'text-kg-fg-faded border-kg-border',
+};
+---
+<div class="bg-kg-bg-elevated border border-kg-border rounded-lg overflow-hidden">
+  <div class="px-4 py-2.5 border-b border-kg-border flex items-center justify-between bg-kg-bg-card/40">
+    <h3 class="text-kg-fg font-mono text-sm uppercase tracking-wider">Activity Feed</h3>
+    <span class="text-kg-fg-faded text-xs font-mono">{events.length} events</span>
+  </div>
+  {events.length === 0 ? (
+    <div class="px-4 py-8 text-center">
+      <p class="text-kg-fg-muted text-sm">No activity recorded yet.</p>
+      <p class="text-kg-fg-faded text-xs mt-1">Run recon or log a Flight Recorder event to populate this feed.</p>
+    </div>
+  ) : (
+    <ul class="divide-y divide-kg-border max-h-[480px] overflow-y-auto">
+      {events.map((ev) => (
+      <li class="px-4 py-2 hover:bg-kg-bg-card/30 transition-colors flex items-center gap-3">
+        <span class={`shrink-0 inline-flex items-center text-[10px] font-mono uppercase tracking-wider border rounded px-1.5 py-0.5 ${kindColors[ev.kind] ?? kindColors.other}`}>
+          {ev.kind}
+        </span>
+        {ev.source === 'flight-recorder' && ev.event ? (
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-kg-fg-muted font-mono text-xs shrink-0">{ev.event.target}</span>
+              <span class="text-kg-fg-faded text-xs">/</span>
+              <span class="text-kg-wave-aqua font-mono text-xs uppercase">{ev.event.phase}</span>
+              <span class="text-kg-fg font-mono text-xs truncate">{ev.event.action}</span>
+              <span class="text-kg-fg-faded font-mono text-[10px] uppercase border border-kg-border rounded px-1 py-0.5">{ev.event.status}</span>
+            </div>
+            {ev.event.message && <p class="text-kg-fg-faded text-xs truncate mt-0.5" title={ev.event.message}>{ev.event.message}</p>}
+          </div>
+        ) : ev.target === '(reports)' ? (
+          <span class="text-kg-wave-blue font-mono text-xs truncate" title={ev.path}>{ev.path}</span>
+        ) : (
+          <a
+            href={`/programs/${encodeURIComponent(ev.target)}?file=${encodeURIComponent(ev.path ?? '')}`}
+            class="text-kg-fg font-mono text-xs hover:text-kg-wave-blue truncate flex-1 min-w-0"
+            title={ev.path}
+          >
+            <span class="text-kg-fg-muted">{ev.target}/</span>{ev.path}
+          </a>
+        )}
+        <span class="shrink-0 text-kg-fg-faded font-mono text-xs">{ev.relTime}</span>
+      </li>
+      ))}
+    </ul>
+  )}
+</div>

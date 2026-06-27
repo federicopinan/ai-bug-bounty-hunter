@@ -1,0 +1,15 @@
+---
+interface Props {
+  title: string;
+  message: string;
+  hint?: string;
+}
+
+const { title, message, hint } = Astro.props;
+---
+<div class="border border-dashed border-kg-border rounded-lg p-8 text-center bg-kg-bg-elevated/30">
+  <div class="font-mono text-kg-wave-blue text-2xl mb-2">∅</div>
+  <h3 class="text-kg-fg text-lg font-semibold mb-1">{title}</h3>
+  <p class="text-kg-fg-muted text-sm max-w-md mx-auto">{message}</p>
+  {hint && <p class="text-kg-fg-faded text-xs mt-3 font-mono">{hint}</p>}
+</div>

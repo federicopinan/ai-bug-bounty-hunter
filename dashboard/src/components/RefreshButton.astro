@@ -1,0 +1,13 @@
+---
+interface Props {
+  size?: 'sm' | 'md';
+  label?: string;
+}
+
+const { size = 'md', label = 'Live' } = Astro.props;
+const dotSize = size === 'sm' ? 'w-1.5 h-1.5' : 'w-2 h-2';
+---
+<span class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-kg-dragon-green">
+  <span class={`${dotSize} rounded-full bg-kg-dragon-green kg-pulse`}></span>
+  {label}
+</span>

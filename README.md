@@ -1,15 +1,13 @@
 ```
-  ============================================================
-   _   _   _ _____ ___  __  __   _   _ _   _ _____ ____ ____
-  | | | | / |  _  |_ _||  \/  | | \ | | \ | |_   _|  _ \_   _|
-  | |_| | | | |_) || | | |\/| | |  \| |  \| | | | | |_) || |
-  |  _  | | |  _ < | | | |  | | | |\  | |\  | | | |  _ < | |
-  |_| |_| |_|_| \_\|___||_|  |_| |_| \_|_| \_| |_| |_| \_\|_|
-  /_/   \_\_\   /_/   /_/   \_\_\   /_/   \_\___/
-  ============================================================
-        [ RECON ]  ->  [ HUNT ]  ->  [ VALIDATE ]  ->  [ REPORT ]
-        //  scanning the perimeter since the perimeter had bugs  //
-  ============================================================
+  ______  ______      ____                        __                              __                __                      __
+/\  _  \/\__  _\    /\  _`\                     /\ \                            /\ \__            /\ \                    /\ \__
+\ \ \L\ \/_/\ \/    \ \ \L\ \  __  __     __    \ \ \____    ___   __  __    ___\ \ ,_\  __  __   \ \ \___   __  __    ___\ \ ,_\    __   _ __
+ \ \  __ \ \ \ \     \ \  _ <'/\ \/\ \  /'_ `\   \ \ '__`\  / __`\/\ \/\ \ /' _ `\ \ \/ /\ \/\ \   \ \  _ `\/\ \/\ \ /' _ `\ \ \/  /'__`\/\`'__\
+  \ \ \/\ \ \_\ \__   \ \ \L\ \ \ \_\ \/\ \L\ \   \ \ \L\ \/\ \L\ \ \ \_\ \/\ \/\ \ \ \_\ \ \_\ \   \ \ \ \ \ \ \_\ \/\ \/\ \ \ \_/\  __/\ \ \/
+   \ \_\ \_\/\_____\   \ \____/\ \____/\ \____ \   \ \_,__/\ \____/\ \____/\ \_\ \_\ \__\\/`____ \   \ \_\ \_\ \____/\ \_\ \_\ \__\ \____\\ \_\
+    \/_/\/_/\/_____/    \/___/  \/___/  \/___L\ \   \/___/  \/___/  \/___/  \/_/\/_/\/__/ `/___/> \   \/_/\/_/\/___/  \/_/\/_/\/__/\/____/ \/_/
+                                          /\____/                                            /\___/
+                                          \_/__/                                             \/__/
 ```
 
 > AI-assisted bug bounty hunting workspace. Recon → Hunt → Validate → Report.
@@ -64,6 +62,17 @@ tools/scripts/check-env.sh
 /report <finding>             # writes to reports/<program>.md
 # or create a draft directly:
 tools/scripts/new-finding.sh High IDOR "Invoice download exposes other users" <target>
+
+# Optional: log AI/script actions for the dashboard Flight Recorder
+tools/scripts/log-event.sh <target> recon subfinder success "Discovered subdomains"
+
+# Gate automation before running commands (strict deny on missing/invalid scope.json)
+tools/scripts/scope-guard.sh <target> --url https://api.acme.com/v1/users --action recon
+
+# Create evidence vault and generate a report draft from real evidence
+tools/scripts/evidence-vault.sh init <target> finding-1 --title "IDOR exposes invoices" --severity High --type IDOR --endpoint /api/invoices/123
+tools/scripts/evidence-vault.sh add <target> finding-1 --file ./request.http --kind request --description "Minimal PoC request"
+tools/scripts/build-report.sh <target> finding-1
 ```
 
 ---
@@ -205,9 +214,30 @@ full upstream collections (SecLists, OneListForAll, fuzz4bounty).
   matrix. Use it before testing auth, IDOR/BOLA, API, OAuth/SSO, account
   takeover, or business logic surfaces.
 - `templates/target/` contains target-local templates for `auth-matrix.md`,
-  `hunt-session.md`, and `evidence-log.md`.
+  `hunt-session.md`, `evidence-log.md`, and the machine-readable `scope.json`
+  Scope Guard companion. Keep human policy notes in `scope.md`; use
+  `scope.json` to gate automation.
 - `tools/scripts/new-finding.sh` creates HackerOne-style Markdown finding drafts
   under `programs/<target>/vulns/` or the current directory.
+- `dashboard/` provides a local read-only Astro dashboard for programs,
+  findings, and activity. Run it with `docker compose up -d --build`.
+- `tools/scripts/log-event.sh` appends structured Flight Recorder events to
+  `programs/<target>/activity/events.jsonl`; these appear in `/api/activity`
+  and the dashboard Activity Feed.
+- `tools/scripts/scope-guard.sh` validates `--host` or `--url` plus an action
+  against `programs/<target>/scope.json`; denied or unvalidated scope exits
+  nonzero and emits a JSON decision. Candidate hosts/URLs must be concrete
+  values (no `*`, `?`, `[`, or `]`). `outOfScope` rules are deny-first: a
+  matching rule without `actions` blocks every action and cannot be overridden
+  by a later broad `inScope` rule.
+- `tools/scripts/evidence-vault.sh` manages per-finding vaults under
+  `programs/<target>/vulns/poc/<finding_id>/`. `tools/scripts/build-report.sh`
+  turns vault metadata and evidence files into `reports/<target>-<finding_id>.md`
+  without inventing missing exploit details. Use `--strict` to fail report
+  generation when required metadata, reproduction/impact text, or evidence files
+  are missing. Evidence copies are capped at 10MB by default; override with
+  `EVIDENCE_VAULT_MAX_BYTES=<bytes>` when a program explicitly requires a
+  different local limit.
 
 ---
 

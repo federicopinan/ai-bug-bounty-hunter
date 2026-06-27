@@ -1,0 +1,234 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FindingRow from '../../components/FindingRow.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import FileViewer from '../../components/FileViewer.astro';
+import { getProgramDetail, listTargetDirs } from '../../lib/scanner.ts';
+import { SEVERITY_ORDER } from '../../lib/types.ts';
+
+export const prerender = false;
+
+const { target } = Astro.params;
+const decodedTarget = target ? decodeURIComponent(target) : '';
+const allTargets = await listTargetDirs();
+
+if (!allTargets.includes(decodedTarget)) {
+  return Astro.redirect('/');
+}
+
+const detail = await getProgramDetail(decodedTarget);
+if (!detail) {
+  return Astro.redirect('/');
+}
+
+const sevColors: Record<string, string> = {
+  Critical: 'bg-kg-dragon-red',
+  High: 'bg-kg-autumn',
+  Medium: 'bg-kg-boat-yellow',
+  Low: 'bg-kg-wave-blue',
+  Info: 'bg-kg-fg-faded',
+};
+
+const reconKeys = [
+  { key: 'subdomains', label: 'subdomains', file: 'subdomains.txt' },
+  { key: 'liveHosts', label: 'live hosts', file: 'live-hosts.txt' },
+  { key: 'ports', label: 'ports', file: 'ports.txt' },
+  { key: 'techStack', label: 'tech stack', file: 'tech-stack.txt' },
+  { key: 'endpoints', label: 'endpoints', file: 'endpoints.txt' },
+  { key: 'jsFiles', label: 'JS files', file: 'js-files.txt' },
+  { key: 'wayback', label: 'wayback', file: 'wayback.txt' },
+] as const;
+
+const fileParam = Astro.url.searchParams.get('file');
+---
+<BaseLayout title={decodedTarget} subtitle={`${detail.program ?? 'unknown program'} · ${detail.started ?? 'no start date'}`}>
+  <section class="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+      <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Total</div>
+      <div class="text-kg-fg text-3xl font-mono font-bold">{detail.findingsCount}</div>
+    </div>
+    <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+      <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Severity</div>
+      <div class="flex gap-1 mt-2">
+        {SEVERITY_ORDER.map((s) => {
+          const count = detail.findingsBySeverity[s];
+          return (
+            <div class="flex-1 text-center">
+              <div class={`${sevColors[s]} ${count > 0 ? '' : 'opacity-30'} rounded-sm h-6 mb-1`}></div>
+              <div class="text-kg-fg-faded text-[10px] font-mono uppercase">{s.slice(0, 3)}</div>
+              <div class="text-kg-fg text-xs font-mono font-semibold">{count}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+    <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+      <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Status</div>
+      <div class="text-kg-fg-faded text-xs font-mono space-y-1 mt-1">
+        {(['NEW', 'VALIDATED', 'REPORTED', 'DUPLICATE', 'CLOSED', 'RESOLVED'] as const).map((s) => {
+          const count = detail.findingsByStatus[s];
+          if (count === 0) return null;
+          return (
+            <div class="flex items-center justify-between">
+              <StatusBadge status={s} size="sm" />
+              <span class="text-kg-fg font-mono text-sm">{count}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+    <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+      <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Last Activity</div>
+      <div class="text-kg-fg text-sm font-mono mt-1">
+        {detail.lastActivity ? new Date(detail.lastActivity).toLocaleString() : '—'}
+      </div>
+      <div class="text-kg-fg-faded text-xs font-mono mt-0.5">{detail.lastActivityRel ?? '—'}</div>
+    </div>
+  </section>
+
+  <section class="mb-6">
+    <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider mb-3">Scope Guard</h2>
+    <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+      {detail.scopeGuard.available ? (
+        <div class="grid md:grid-cols-4 gap-3 text-sm font-mono">
+          <div>
+            <div class="text-kg-fg-faded text-xs uppercase tracking-wider">Status</div>
+            <div class="text-kg-spring-green">available</div>
+          </div>
+          <div>
+            <div class="text-kg-fg-faded text-xs uppercase tracking-wider">Rules</div>
+            <div class="text-kg-fg">{detail.scopeGuard.inScopeRules} in / {detail.scopeGuard.outOfScopeRules} out</div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="text-kg-fg-faded text-xs uppercase tracking-wider">Allowed actions</div>
+            <div class="text-kg-fg break-words">{detail.scopeGuard.allowedActions.join(', ') || '—'}</div>
+          </div>
+          {detail.scopeGuard.policyUrl && (
+            <div class="md:col-span-4">
+              <a href={detail.scopeGuard.policyUrl} target="_blank" rel="noopener noreferrer" class="text-kg-wave-blue hover:underline">
+                policy ↗
+              </a>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div class="text-kg-fg-faded text-sm font-mono">
+          {detail.scopeGuard.error ? `scope.json invalid: ${detail.scopeGuard.error}` : 'No machine-readable scope.json found. Automation should deny by default.'}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="mb-6">
+    <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider mb-3">Recon</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+      {reconKeys.map(({ key, label, file }) => {
+        const value = detail.recon[key];
+        const exists = detail.reconFiles.some((f) => f.name === file);
+        return (
+          <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-3 text-center">
+            <div class="text-kg-fg text-2xl font-mono font-bold leading-none">{value}</div>
+            <div class="text-kg-fg-faded text-[10px] font-mono uppercase tracking-wider mt-1.5">{label}</div>
+            {!exists && value === 0 && (
+              <div class="text-kg-fg-faded/50 text-[9px] font-mono mt-0.5">no file</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+    {detail.reconFiles.length > 0 && (
+      <div class="mt-3 bg-kg-bg-elevated border border-kg-border rounded-lg overflow-hidden">
+        <div class="px-4 py-2 border-b border-kg-border bg-kg-bg-card/40 text-kg-fg-faded font-mono text-xs uppercase tracking-wider">
+          Recon Artifacts
+        </div>
+        <ul class="divide-y divide-kg-border">
+          {detail.reconFiles.map((f) => (
+            <li class="px-4 py-2 flex items-center justify-between hover:bg-kg-bg-card/30">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <span class="text-kg-wave-aqua font-mono text-sm">·</span>
+                <span class="text-kg-fg font-mono text-sm truncate">{f.name}</span>
+              </div>
+              <div class="flex items-center gap-4 shrink-0">
+                <span class="text-kg-fg-faded font-mono text-xs">{f.lines} lines</span>
+                <span class="text-kg-fg-faded font-mono text-xs">{(f.size / 1024).toFixed(1)}KB</span>
+                <a
+                  href={`/api/raw/${encodeURIComponent(decodedTarget)}/recon/${encodeURIComponent(f.name)}`}
+                  target="_blank"
+                  class="text-kg-wave-blue font-mono text-xs hover:underline"
+                >
+                  view →
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  <section class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider">Findings ({detail.findings.length})</h2>
+      {detail.scopeUrl && (
+        <a href={detail.scopeUrl} target="_blank" rel="noopener noreferrer" class="text-kg-wave-blue text-xs font-mono hover:underline">
+          scope ↗
+        </a>
+      )}
+    </div>
+    {detail.findings.length === 0 ? (
+      <EmptyState
+        title={detail.hasTracker ? 'No findings recorded' : 'No tracker yet'}
+        message={
+          detail.hasTracker
+            ? 'The tracker exists but has no findings.'
+            : 'Create programs/{target}/vulns/tracker.md to start logging findings.'
+        }
+      />
+    ) : (
+      <div class="space-y-2">
+        {detail.findings.map((f) => <FindingRow finding={f} showTarget={false} />)}
+      </div>
+    )}
+    {detail.evidenceVaults.length > 0 && (
+      <div class="mt-4 bg-kg-bg-elevated border border-kg-border rounded-lg overflow-hidden">
+        <div class="px-4 py-2 border-b border-kg-border bg-kg-bg-card/40 text-kg-fg-faded font-mono text-xs uppercase tracking-wider">
+          Evidence Vaults
+        </div>
+        <ul class="divide-y divide-kg-border">
+          {detail.evidenceVaults.map((vault) => (
+            <li class="px-4 py-2 flex items-center justify-between hover:bg-kg-bg-card/30">
+              <div class="min-w-0">
+                <div class="text-kg-fg font-mono text-sm truncate">{vault.findingId} — {vault.title ?? 'untitled'}</div>
+                <div class="text-kg-fg-faded font-mono text-xs truncate">{vault.path}</div>
+              </div>
+              <div class="text-kg-fg-faded font-mono text-xs shrink-0">{vault.evidenceCount} files</div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  {fileParam && (
+    <section class="mb-6">
+      <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider mb-3">
+        File: <span class="text-kg-wave-blue">{fileParam}</span>
+      </h2>
+      <FileViewer target={decodedTarget} path={fileParam} />
+    </section>
+  )}
+</BaseLayout>
+
+<script>
+  // Soft auto-refresh on detail page
+  let lastActivity = Date.now();
+  ['click', 'keydown', 'scroll', 'mousemove'].forEach((ev) =>
+    document.addEventListener(ev, () => (lastActivity = Date.now()), { passive: true }),
+  );
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - lastActivity > 60_000) location.reload();
+  }, 30_000);
+</script>

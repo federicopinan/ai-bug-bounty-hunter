@@ -1,0 +1,31 @@
+---
+interface Props {
+  target: string;
+  path: string;
+}
+
+const { target, path } = Astro.props;
+
+const url = `/api/raw/${encodeURIComponent(target)}/${path
+  .split('/')
+  .map((p) => encodeURIComponent(p))
+  .join('/')}`;
+
+const res = await fetch(url);
+const file = res.ok ? await res.json() : null;
+---
+<div class="bg-kg-bg-elevated border border-kg-border rounded-lg overflow-hidden">
+  {!file ? (
+    <div class="p-4 text-kg-dragon-red font-mono text-sm">Failed to load file (404 or too large).</div>
+  ) : (
+    <>
+      <div class="px-4 py-2 border-b border-kg-border bg-kg-bg-card/40 flex items-center justify-between">
+        <span class="text-kg-fg-muted font-mono text-xs">{path}</span>
+        <span class="text-kg-fg-faded font-mono text-xs">
+          {(file.size / 1024).toFixed(1)}KB · {new Date(file.mtime).toLocaleString()}
+        </span>
+      </div>
+      <pre class="p-4 text-kg-fg font-mono text-xs overflow-x-auto whitespace-pre-wrap break-words max-h-[600px] overflow-y-auto">{file.content}</pre>
+    </>
+  )}
+</div>

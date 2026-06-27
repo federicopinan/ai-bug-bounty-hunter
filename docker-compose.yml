@@ -1,0 +1,22 @@
+services:
+  dashboard:
+    build: ./dashboard
+    container_name: bounty-dashboard
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./:/app/project:ro
+      - ./reports:/app/reports:ro
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+      - PROJECT_ROOT=/app/project
+      - REPORTS_ROOT=/app/reports
+      - CACHE_TTL_MS=5000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4321/api/programs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

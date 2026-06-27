@@ -1,0 +1,25 @@
+---
+import type { Severity } from '../lib/types.ts';
+
+interface Props {
+  severity: Severity;
+  size?: 'sm' | 'md';
+}
+
+const { severity, size = 'md' } = Astro.props;
+
+const colorMap: Record<Severity, { bg: string; text: string; border: string; dot: string }> = {
+  Critical: { bg: 'bg-kg-dragon-red/15', text: 'text-kg-dragon-red', border: 'border-kg-dragon-red/40', dot: 'bg-kg-dragon-red' },
+  High: { bg: 'bg-kg-autumn/15', text: 'text-kg-autumn', border: 'border-kg-autumn/40', dot: 'bg-kg-autumn' },
+  Medium: { bg: 'bg-kg-boat-yellow/15', text: 'text-kg-boat-yellow', border: 'border-kg-boat-yellow/40', dot: 'bg-kg-boat-yellow' },
+  Low: { bg: 'bg-kg-wave-blue/15', text: 'text-kg-wave-blue', border: 'border-kg-wave-blue/40', dot: 'bg-kg-wave-blue' },
+  Info: { bg: 'bg-kg-fg-faded/10', text: 'text-kg-fg-faded', border: 'border-kg-fg-faded/30', dot: 'bg-kg-fg-faded' },
+};
+
+const c = colorMap[severity];
+const sizeClass = size === 'sm' ? 'text-[10px] px-1.5 py-0.5' : 'text-xs px-2 py-1';
+---
+<span class={`inline-flex items-center gap-1.5 rounded-md border font-mono uppercase tracking-wider ${c.bg} ${c.text} ${c.border} ${sizeClass}`}>
+  <span class={`inline-block w-1.5 h-1.5 rounded-full ${c.dot}`}></span>
+  {severity}
+</span>

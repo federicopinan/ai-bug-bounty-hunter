@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StatsBar from '../components/StatsBar.astro';
+import ProgramCard from '../components/ProgramCard.astro';
+import ActivityFeed from '../components/ActivityFeed.astro';
+import FindingRow from '../components/FindingRow.astro';
+import EmptyState from '../components/EmptyState.astro';
+import { scanAllPrograms, getRecentActivity, getAllFindings } from '../lib/scanner.ts';
+
+export const prerender = false;
+
+const programs = await scanAllPrograms();
+const activity = await getRecentActivity(15);
+const allFindings = await getAllFindings();
+
+const topFindings = allFindings
+  .filter((f) => f.severity === 'Critical' || f.severity === 'High')
+  .filter((f) => f.status !== 'INVALID' && f.status !== 'CLOSED' && f.status !== 'RESOLVED')
+  .slice(0, 8);
+
+const banner = String.raw`  ______  ______      ____                        __                              __                __                      __
+/\  _  \/\__  _\    /\  _'\                     /\ \                            /\ \__            /\ \                    /\ \__
+\ \ \L\ \/_/\ \/    \ \ \L\ \  __  __     __    \ \ \____    ___   __  __    ___\ \ ,_\  __  __   \ \ \___   __  __    ___\ \ ,_\    __   _ __
+ \ \  __ \ \ \ \     \ \  _ <'/\ \/\ \  /'_ '\   \ \ '__'\  / __'\/\ \/\ \ /' _ '\ \ \/ /\ \/\ \   \ \  _ '\/\ \/\ \ /' _ '\ \ \/  /'__'\/\'__'\
+  \ \ \/\ \ \_\ \__   \ \ \L\ \ \ \_\ \/\ \L\ \   \ \ \L\ \/\ \L\ \ \ \_\ \/\ \/\ \ \ \_\ \ \_\ \   \ \ \ \ \ \ \_\ \/\ \/\ \ \ \_/\  __/\ \ \/
+   \ \_\ \_\/\_____\   \ \____/\ \____/\ \____ \   \ \_,__/\ \____/\ \____/\ \_\ \_\ \__\\/'____ \   \ \_\ \_\ \____/\ \_\ \_\ \__\ \____\\ \_\
+    \/_/\/_/\/_____/    \/___/  \/___/  \/___L\ \   \/___/  \/___/  \/___/  \/_/\/_/\/__/ '/___/> \   \/_/\/_/\/___/  \/_/\/_/\/__/\/____/ \/_/
+                                          /\____/                                            /\___/
+                                          \_/__/                                             \/__/`;
+---
+<BaseLayout title="Overview">
+  <section class="mb-6">
+    <pre class="kg-banner kg-shimmer text-kg-fg-muted mb-2 select-none">{banner}</pre>
+    <p class="text-kg-fg-muted text-sm font-mono">
+      <span class="text-kg-dragon-red">RECON</span>
+      <span class="text-kg-fg-faded mx-2">→</span>
+      <span class="text-kg-autumn">HUNT</span>
+      <span class="text-kg-fg-faded mx-2">→</span>
+      <span class="text-kg-dragon-green">VALIDATE</span>
+      <span class="text-kg-fg-faded mx-2">→</span>
+      <span class="text-kg-wave-blue">REPORT</span>
+    </p>
+  </section>
+
+  <StatsBar programs={programs} />
+
+  {programs.length === 0 ? (
+    <EmptyState
+      title="No targets yet"
+      message="Initialize a target workspace to start tracking recon, findings, and reports."
+      hint="Run /init <target> <program> in the main workspace, then refresh this page."
+    />
+  ) : (
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider">
+          Active Programs <span class="text-kg-fg-faded text-sm ml-1">({programs.length})</span>
+        </h2>
+        <div class="text-xs font-mono text-kg-fg-faded">
+          recon: <span class="text-kg-wave-aqua">{programs.reduce((s, p) => s + p.recon.subdomains, 0)}</span>
+          · live: <span class="text-kg-wave-aqua">{programs.reduce((s, p) => s + p.recon.liveHosts, 0)}</span>
+          · endpoints: <span class="text-kg-wave-aqua">{programs.reduce((s, p) => s + p.recon.endpoints, 0)}</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+        {programs.map((p) => <ProgramCard program={p} />)}
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-kg-fg font-mono text-lg uppercase tracking-wider">Critical &amp; High</h2>
+            <a href="/findings?severity=Critical&severity=High" class="text-kg-wave-blue text-xs font-mono hover:underline">
+              view all →
+            </a>
+          </div>
+          {topFindings.length === 0 ? (
+            <div class="bg-kg-bg-elevated border border-kg-border rounded-lg px-4 py-6 text-center">
+              <p class="text-kg-fg-faded font-mono text-sm">No open critical or high findings.</p>
+            </div>
+          ) : (
+            <div class="space-y-2">
+              {topFindings.map((f) => <FindingRow finding={f} compact={true} />)}
+            </div>
+          )}
+        </div>
+        <div>
+          <ActivityFeed events={activity} />
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<script>
+  // Soft auto-refresh: reload page if user is idle for 60s and tab is visible
+  let lastActivity = Date.now();
+  ['click', 'keydown', 'scroll', 'mousemove'].forEach((ev) =>
+    document.addEventListener(ev, () => (lastActivity = Date.now()), { passive: true }),
+  );
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - lastActivity > 60_000) location.reload();
+  }, 30_000);
+</script>

@@ -1,0 +1,45 @@
+---
+import RefreshButton from './RefreshButton.astro';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+const path = Astro.url.pathname;
+---
+<header class="border-b border-kg-border bg-kg-bg/95 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-3 group">
+      <div class="font-mono font-bold text-kg-dragon-red text-2xl leading-none group-hover:text-kg-autumn transition-colors">
+        〔H〕
+      </div>
+      <div>
+        <div class="font-mono text-kg-fg text-base leading-tight tracking-wide">HUNTER</div>
+        <div class="font-mono text-kg-fg-faded text-[10px] leading-tight tracking-widest uppercase">
+          bug bounty dashboard
+        </div>
+      </div>
+    </a>
+
+    <nav class="flex items-center gap-1 text-sm font-mono">
+      <a href="/" class={`px-3 py-1.5 rounded-md transition-colors ${path === '/' ? 'bg-kg-wave-blue/15 text-kg-wave-blue' : 'text-kg-fg-muted hover:text-kg-fg hover:bg-kg-bg-elevated'}`}>
+        overview
+      </a>
+      <a href="/findings" class={`px-3 py-1.5 rounded-md transition-colors ${path.startsWith('/findings') ? 'bg-kg-wave-blue/15 text-kg-wave-blue' : 'text-kg-fg-muted hover:text-kg-fg hover:bg-kg-bg-elevated'}`}>
+        findings
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <RefreshButton />
+    </div>
+  </div>
+  {(title || subtitle) && (
+    <div class="max-w-7xl mx-auto px-6 pb-4">
+      {title && <h1 class="text-kg-fg text-xl font-semibold">{title}</h1>}
+      {subtitle && <p class="text-kg-fg-muted text-sm mt-0.5">{subtitle}</p>}
+    </div>
+  )}
+</header>

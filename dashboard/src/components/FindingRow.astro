@@ -1,0 +1,46 @@
+---
+import type { Finding } from '../lib/types.ts';
+import SeverityBadge from './SeverityBadge.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  finding: Finding;
+  showTarget?: boolean;
+  compact?: boolean;
+}
+
+const { finding, showTarget = true, compact = false } = Astro.props;
+---
+<a
+  href={`/programs/${encodeURIComponent(finding.target)}`}
+  class="block kg-card bg-kg-bg-elevated border border-kg-border rounded-lg px-4 py-3 hover:border-kg-wave-blue"
+>
+  <div class="flex items-start gap-3">
+    <div class="shrink-0 pt-0.5">
+      <SeverityBadge severity={finding.severity} size="sm" />
+    </div>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-baseline gap-2 flex-wrap">
+        {showTarget && (
+          <span class="text-kg-wave-blue font-mono text-xs">{finding.target}</span>
+        )}
+        <span class="text-kg-fg-faded font-mono text-xs">·</span>
+        <span class="text-kg-ononokami font-mono text-xs uppercase tracking-wider">{finding.type}</span>
+      </div>
+      <h4 class={`text-kg-fg mt-0.5 ${compact ? 'text-sm' : 'text-base'} font-medium truncate`} title={finding.title}>
+        {finding.title}
+      </h4>
+      {finding.endpoint && !compact && (
+        <div class="text-kg-fg-faded font-mono text-xs mt-1 truncate">
+          <span class="text-kg-fg-muted">endpoint:</span> {finding.endpoint}
+        </div>
+      )}
+    </div>
+    <div class="shrink-0 flex flex-col items-end gap-1.5">
+      <StatusBadge status={finding.status} size="sm" />
+      {finding.bounty && (
+        <span class="text-kg-dragon-green font-mono text-xs">{finding.bounty}</span>
+      )}
+    </div>
+  </div>
+</a>

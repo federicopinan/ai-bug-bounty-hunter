@@ -1,0 +1,25 @@
+---
+import type { FindingStatus } from '../lib/types.ts';
+
+interface Props {
+  status: FindingStatus;
+  size?: 'sm' | 'md';
+}
+
+const { status, size = 'md' } = Astro.props;
+
+const colorMap: Record<FindingStatus, string> = {
+  NEW: 'bg-kg-fg-faded/15 text-kg-fg-faded border-kg-fg-faded/30',
+  VALIDATED: 'bg-kg-dragon-green/15 text-kg-dragon-green border-kg-dragon-green/40',
+  REPORTED: 'bg-kg-wave-blue/15 text-kg-wave-blue border-kg-wave-blue/40',
+  DUPLICATE: 'bg-kg-dragon-red/10 text-kg-dragon-red/80 border-kg-dragon-red/30',
+  CLOSED: 'bg-kg-ononokami/15 text-kg-ononokami border-kg-ononokami/40',
+  RESOLVED: 'bg-kg-wave-aqua/15 text-kg-wave-aqua border-kg-wave-aqua/40',
+  INVALID: 'bg-kg-bg-card text-kg-fg-faded/60 border-kg-border line-through',
+};
+
+const sizeClass = size === 'sm' ? 'text-[10px] px-1.5 py-0.5' : 'text-xs px-2 py-1';
+---
+<span class={`inline-flex items-center rounded-md border font-mono uppercase tracking-wider ${colorMap[status]} ${sizeClass}`}>
+  {status}
+</span>

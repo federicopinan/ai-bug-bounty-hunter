@@ -1,0 +1,108 @@
+---
+import type { ProgramSummary, Severity } from '../lib/types.ts';
+import { SEVERITY_ORDER } from '../lib/types.ts';
+
+interface Props {
+  programs: ProgramSummary[];
+}
+
+const { programs } = Astro.props;
+
+const severityBarColors: Record<Severity, string> = {
+  Critical: 'bg-kg-dragon-red',
+  High: 'bg-kg-autumn',
+  Medium: 'bg-kg-boat-yellow',
+  Low: 'bg-kg-wave-blue',
+  Info: 'bg-kg-fg-faded',
+};
+
+const severityLabelColors: Record<Severity, string> = {
+  Critical: 'text-kg-dragon-red',
+  High: 'text-kg-autumn',
+  Medium: 'text-kg-boat-yellow',
+  Low: 'text-kg-wave-blue',
+  Info: 'text-kg-fg-faded',
+};
+
+const initialStatus = { NEW: 0, VALIDATED: 0, REPORTED: 0, DUPLICATE: 0, CLOSED: 0, RESOLVED: 0, INVALID: 0 } as Record<string, number>;
+const initialSeverity = { Critical: 0, High: 0, Medium: 0, Low: 0, Info: 0 } as Record<Severity, number>;
+
+const findingsByStatus: Record<string, number> = programs.reduce((acc, p) => {
+  for (const [k, v] of Object.entries(p.findingsByStatus)) {
+    acc[k] = (acc[k] ?? 0) + v;
+  }
+  return acc;
+}, { ...initialStatus });
+
+const findingsBySeverity: Record<Severity, number> = programs.reduce((acc, p) => {
+  for (const [k, v] of Object.entries(p.findingsBySeverity)) {
+    const severity = k as Severity;
+    acc[severity] = (acc[severity] ?? 0) + v;
+  }
+  return acc;
+}, { ...initialSeverity });
+
+const totalFindings = programs.reduce((sum, p) => sum + p.findingsCount, 0);
+const totalPrograms = programs.length;
+
+const lastActivityAt = programs
+  .map((p) => p.lastActivity)
+  .filter((x): x is string => !!x)
+  .sort()
+  .pop() ?? null;
+
+const severityBars = SEVERITY_ORDER.filter((s) => findingsBySeverity[s] > 0);
+const totalSev = SEVERITY_ORDER.reduce((sum, s) => sum + findingsBySeverity[s], 0);
+
+const lastActivityLabel = lastActivityAt
+  ? new Date(lastActivityAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  : '—';
+const lastActivityDate = lastActivityAt
+  ? new Date(lastActivityAt).toLocaleDateString()
+  : 'no targets yet';
+---
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+  <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+    <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Programs</div>
+    <div class="text-kg-fg text-3xl font-mono font-bold">{totalPrograms}</div>
+  </div>
+
+  <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+    <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Findings</div>
+    <div class="text-kg-fg text-3xl font-mono font-bold">{totalFindings}</div>
+    <div class="text-kg-fg-muted text-xs mt-1 font-mono">
+      {findingsByStatus.NEW} new · {findingsByStatus.VALIDATED} validated · {findingsByStatus.REPORTED} reported
+    </div>
+  </div>
+
+  <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+    <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Severity Mix</div>
+    {totalSev > 0 && (
+      <div class="flex h-3 rounded overflow-hidden mt-2 border border-kg-border">
+        {severityBars.map((s) => {
+          const pct = (findingsBySeverity[s] / totalSev) * 100;
+          const title = `${s}: ${findingsBySeverity[s]}`;
+          const cls = severityBarColors[s];
+          return <div class={cls} style={`width:${pct}%`} title={title}></div>;
+        })}
+      </div>
+    )}
+    {totalSev === 0 && (
+      <div class="text-kg-fg-faded text-sm font-mono mt-2">—</div>
+    )}
+    <div class="flex gap-3 text-[10px] font-mono uppercase tracking-wider mt-2 flex-wrap">
+      {severityBars.map((s) => (
+        <span class={severityLabelColors[s]}>
+          {s.slice(0, 3)} · {findingsBySeverity[s]}
+        </span>
+      ))}
+      {severityBars.length === 0 && <span class="text-kg-fg-faded">no data</span>}
+    </div>
+  </div>
+
+  <div class="kg-card bg-kg-bg-elevated border border-kg-border rounded-lg p-4">
+    <div class="text-kg-fg-faded text-xs font-mono uppercase tracking-wider mb-1">Last Activity</div>
+    <div class="text-kg-fg text-sm font-mono mt-1">{lastActivityLabel}</div>
+    <div class="text-kg-fg-muted text-xs font-mono mt-0.5">{lastActivityDate}</div>
+  </div>
+</div>

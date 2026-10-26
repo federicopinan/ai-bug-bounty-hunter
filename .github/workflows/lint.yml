@@ -14,8 +14,8 @@ jobs:
     name: Markdown (markdownlint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: DavidAnson/markdownlint-cli2-action@v19
+      - uses: actions/checkout@v6
+      - uses: DavidAnson/markdownlint-cli2-action@v25.0.0
         with:
           globs: |
             **/*.md
@@ -25,7 +25,7 @@ jobs:
     name: Shell (shellcheck)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run shellcheck
         run: |
           set -e
@@ -45,7 +45,7 @@ jobs:
     name: JSON (jq)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate JSON files
         run: |
           set -e
@@ -71,7 +71,7 @@ jobs:
     name: YAML (yamllint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install yamllint
         run: |
           python3 -m pip install --quiet --upgrade yamllint
@@ -93,7 +93,7 @@ jobs:
     name: Links (lychee)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run lychee
         uses: lycheeverse/lychee-action@v2
         with:
@@ -102,13 +102,21 @@ jobs:
             --no-progress
             --exclude-loopback
             --exclude-mail
-            --exclude '^\.agents/'
-            --exclude '^payloads/'
-            --exclude '^programs/\{target\}/'
-            --exclude '^\.claude/skills/bug-bounty-init/assets/notes-template\.md$'
+            --exclude-path .agents
+            --exclude-path payloads
+            --exclude-path 'programs/{target}'
+            --exclude-path .claude/skills/bug-bounty-init/assets/notes-template.md
             --exclude 'https://portswigger.net'
             --exclude 'https://github.com/.*/(issues|pulls|actions|releases).*'
             --exclude 'https://www.linkedin.com'
             **/*.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Show link report
+        if: always()
+        run: |
+          if [[ -f lychee/out.md ]]; then
+            cat lychee/out.md
+          else
+            echo "No link report produced; inspect the Run lychee step output."
+          fi

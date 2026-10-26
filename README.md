@@ -239,6 +239,21 @@ full upstream collections (SecLists, OneListForAll, fuzz4bounty).
   `EVIDENCE_VAULT_MAX_BYTES=<bytes>` when a program explicitly requires a
   different local limit.
 
+Evidence safety: `evidence-vault.sh init` only creates a new vault. Repeating it
+for an existing finding fails without resetting metadata or evidence; use `add`
+and `list` for existing vaults. Report output rejects paths resolving outside
+`reports/`, including dangling symlinks. These checks do not make local writes
+safe against concurrent hostile filesystem changes.
+
+Run the dependency-free evidence regression tests locally with:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tools/tests -v
+```
+
+These tests use disposable repository copies outside the workspace and do not
+contact targets or modify real program/report data.
+
 ---
 
 ## Wordlists

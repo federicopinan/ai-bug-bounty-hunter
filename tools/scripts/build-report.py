@@ -85,7 +85,9 @@ def safe_report_output(target: str, finding_id: str) -> Path:
     except ValueError as exc:
         raise ValueError("reports directory resolves outside repository") from exc
     out = reports / f"{target}-{finding_id}.md"
-    out_resolved = out.resolve() if out.exists() else reports_real / out.name
+    # Resolve even dangling symlinks: exists() follows the link and can be false
+    # while write_text() would still create a file at its external destination.
+    out_resolved = out.resolve()
     try:
         out_resolved.relative_to(reports_real)
     except ValueError as exc:

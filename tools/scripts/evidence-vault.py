@@ -113,7 +113,10 @@ def command_init(args: argparse.Namespace) -> None:
     if args.severity not in SEVERITIES:
         fail("severity must be one of: Info, Informational, Low, Medium, High, Critical")
     root = vault_dir(target, finding_id)
-    root.mkdir(parents=True, exist_ok=True)
+    try:
+        root.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        fail("evidence vault already exists; use add or list without reinitializing")
     metadata = {
         "target": target,
         "findingId": finding_id,
@@ -172,7 +175,7 @@ def command_list(args: argparse.Namespace) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Create and manage a finding evidence vault.")
     sub = parser.add_subparsers(dest="command", required=True)
-    init = sub.add_parser("init")
+    init = sub.add_parser("init", help="Create a new vault; refuse an existing directory without changing it.")
     init.add_argument("target")
     init.add_argument("finding_id")
     init.add_argument("--title", required=True)
